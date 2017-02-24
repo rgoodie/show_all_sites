@@ -1,0 +1,7 @@
+name = Show all sites
+description = Produces a block to infer all multisite URLs (if the folder is named well).
+core = 7.x
+
+files[]=Sites.class.php
+
+configure = admin/config/show_all_sites

@@ -1,0 +1,85 @@
+<?php
+
+
+/**
+ * Implements hook_block_info().
+ */
+function show_all_sites_block_info()
+{
+    $blocks['sites'] = array(
+        'info' => t('Show Sites'),
+    );
+
+    return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function show_all_sites_block_view($delta = '')
+{
+
+    // get url patterns once
+    $url_patterns = variable_get('show_all_sites_URLpattern', '');
+
+    // Check if this has been configured
+    if ($url_patterns == '') {
+        drupal_set_message(t("Please set up <i>URL Patterns</i> in this module's !adminpage.",
+            array(
+                '!adminpage' => l('Admin Page', 'admin/config/show_all_sites')
+            )
+        ),'error');
+    }
+
+
+    $sites = new Sites();
+    $block['subject'] = t('Running Sites');
+    $block['content'][] = array('#markup' => theme_item_list(array(
+        'items' => $sites->getLinks(),
+        'title' => t('Direct URLs'),
+        'type' => 'ul',
+        'attributes' => array()
+    )));
+   $block['content'][] = array('#markup'=>theme_item_list(array(
+        'title'=>t('All folders'),
+        'items'=>$sites->getRaw(),
+        'type'=>'ul',
+        'attributes' =>array(),
+    )));
+
+
+    return $block;
+}
+
+
+/**
+ * Implements hook_menu().
+ */
+function show_all_sites_menu()
+{
+    $items = array();
+    $items['admin/config/show_all_sites'] = array(
+        'title' => 'Administer Show All Sites',
+        'description' => 'Configure settings for Show All Sites.',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('show_all_sites_settings_form'),
+        'access arguments' => array('administer show_all_sites'),
+        'file' => 'show_all_sites.admin.inc',
+    );
+
+    return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function show_all_sites_permission()
+{
+    $permissions = array();
+    $permissions['admin_show_all_sites'] = array(
+        'title' => t('Administer'),
+        'description' => t(''),
+    );
+
+    return $permissions;
+}
