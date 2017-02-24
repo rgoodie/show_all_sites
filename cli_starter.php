@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: carbon
- * Date: 2/22/17
- * Time: 4:02 PM
+ * This file is used in the initial creation of the plugin. I begin on the command line
+ * using drush scr cli_starter.php
  */
 
 
