@@ -11,6 +11,7 @@ class ExamineSubmissions
 
     public $report = array();
     private $nid;
+    private $record_count;
     private $roles;
     private $oldest_date = array();
     private $newest_date = array();
@@ -37,6 +38,7 @@ class ExamineSubmissions
         $this->oldest_date = $this->getOldestSubmission();
         $this->newest_date = $this->getNewestSubmission();
         $this->principle_contacts = $this->getPrinipcleContacts();
+        $this->record_count = $this->getSubmissionCount();
         $this->title = node_page_title(node_load($nid));
 
         $this->now = time();
@@ -76,6 +78,22 @@ class ExamineSubmissions
         return $query;
 
     }
+
+
+    public function getSubmissionCount() {
+
+        $query = db_select('webform_submissions', 'wfs')
+            ->fields('wfs', array('sid'))
+            ->condition('nid', $this->nid, '=')
+            ->orderBy('submitted', 'desc')
+            ->execute()
+            ->fetchAll()
+            ;
+
+        return count($query);
+
+    }
+
 
     /**
      * Provides all users who belong to other roles outside of the standard three: anonymous, admin, authenticated. Why?
@@ -139,6 +157,7 @@ class ExamineSubmissions
             'Title' => $this->title,
             'Oldest' => $this->oldest_date->human_date,
             'Newest' => $this->newest_date->human_date,
+            'Count'=>$this->record_count,
         );
     }
 

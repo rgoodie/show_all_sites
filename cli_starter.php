@@ -15,6 +15,6 @@
 
 // include_once("ExamineSubmissions.class.php");
 $submissions = new ExamineSubmissions(4);
-print_r($submissions);
+print_r($submissions->getSubmissionCount());
 
 
