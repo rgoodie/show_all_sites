@@ -10,7 +10,7 @@ function show_all_sites_block_info()
         'info' => t('Show Sites'),
     );
     $blocks['examine-webform'] = array(
-        'info'=>t('Examine the webform. Shows oldest and newest submissions. Show prinple contacts.')
+        'info' => t('Examine the webform. Shows oldest and newest submissions. Show prinple contacts.')
     );
 
     return $blocks;
@@ -34,12 +34,11 @@ function show_all_sites_block_view($delta = '')
 }
 
 
-
-
 /*
  * Block title and content that lists out sites. Depends on MultiSites.class.php
  * */
-function show_all_sites_sites_block_content() {
+function show_all_sites_sites_block_content()
+{
     // get url patterns once
     $url_patterns = variable_get('show_all_sites_URLpattern', '');
 
@@ -49,7 +48,7 @@ function show_all_sites_sites_block_content() {
             array(
                 '!adminpage' => l('Admin Page', 'admin/config/show_all_sites')
             )
-        ),'error');
+        ), 'error');
     }
 
 
@@ -61,11 +60,11 @@ function show_all_sites_sites_block_content() {
         'type' => 'ul',
         'attributes' => array()
     )));
-    $block['content'][] = array('#markup'=>theme_item_list(array(
-        'title'=>t('All folders'),
-        'items'=>$sites->getRaw(),
-        'type'=>'ul',
-        'attributes' =>array(),
+    $block['content'][] = array('#markup' => theme_item_list(array(
+        'title' => t('All folders'),
+        'items' => $sites->getRaw(),
+        'type' => 'ul',
+        'attributes' => array(),
     )));
 
 
@@ -73,36 +72,53 @@ function show_all_sites_sites_block_content() {
 }
 
 
-function show_all_sites_examine_webform_block_content() {
+function show_all_sites_examine_webform_block_content()
+{
 
     // get list of uids of webforms
-    $webform_uids = array_keys(node_load_multiple(array(), array('type'=>'webform')));
+    $webform_uids = array_keys(node_load_multiple(array(), array('type' => 'webform')));
 
     $submissions = array();
-    foreach($webform_uids as $webform_uid) {
+    foreach ($webform_uids as $webform_uid) {
         $submissions[] = new ExamineSubmissions($webform_uid);
     }
     $reports_table = array();
-    foreach($submissions as $submission) {
+    foreach ($submissions as $submission) {
         $reports_table[] = $submission->toReport();
     }
 
     $block['subject'] = t('Examine Webform');
-    $block['content'][] = array('#markup'=> theme_table(array(
-        'header'=>array_keys($reports_table[0]),
-        'rows'=>$reports_table,
-        'attributes'=>array(),
-        'caption'=>array(),
-        'colgroups'=>array(),
-        'sticky'=>'',
-        'empty'=>''
+    $block['content'][] = array('#markup' => theme_table(array(
+        'header' => array_keys($reports_table[0]),
+        'rows' => $reports_table,
+        'attributes' => array('class'=>array(
+            'table',
+            'table-striped'
+        )),
+        'caption' => t('The oldest and newest entries in each webform submission.'),
+        'colgroups' => array(),
+        'sticky' => '',
+        'empty' => ''
     )));
 
-    kpr($reports_table);
+    $primary_contacts = ExamineSubmissions::getPrinipcleContacts();
 
+    $block['content'][] = array('#markup' => theme_table(array(
+        'header' => array_keys($primary_contacts[0]),
+        'rows' => $primary_contacts,
+        'attributes' => array('class'=>array(
+            'table',
+            'table-striped'
+        )),
+        'caption' => t('Individuals who are in groups other than admin or authenticated who may have ownership of this data.'),
+        'colgroups' => array(),
+        'sticky' => '',
+        'empty' => ''
+    )));
 
     return $block;
 }
+
 /**
  * Implements hook_menu().
  */

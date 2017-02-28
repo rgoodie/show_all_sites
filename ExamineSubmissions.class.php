@@ -9,6 +9,7 @@
 class ExamineSubmissions
 {
 
+    public $report = array();
     private $nid;
     private $roles;
     private $oldest_date = array();
@@ -16,7 +17,6 @@ class ExamineSubmissions
     private $principle_contacts = array();
     private $now;
     private $title;
-    public $report =array();
 
     public function __construct($nid = 0)
     {
@@ -77,8 +77,20 @@ class ExamineSubmissions
 
     }
 
-    public static function getPrinipcleContacts($nid, $roles)
+    /**
+     * Provides all users who belong to other roles outside of the standard three: anonymous, admin, authenticated. Why?
+     * Well, these would suggest specialized roles were created to review webform data. Therefore, this allows us to
+     * present information to site admins, through a properly configured block to let them make the decision.
+     *
+     * Moving to STATIC since we really only need to run this once, irrespective of webform / nid/
+     *
+     *
+     * @return array
+     */
+    public static function getPrinipcleContacts()
     {
+
+
         // Get a list of user roles. Rule of non-admin, standard roles with
         // this filter
         $roles = array_filter(user_roles(), function ($item) {
@@ -89,7 +101,7 @@ class ExamineSubmissions
 
         $query = db_select('users_roles', 'ur')
             ->fields('ur', array('uid'))
-            ->condition('rid', array_keys($this->roles), 'IN')
+            ->condition('rid', array_keys($roles), 'IN')
             ->distinct()
             ->execute();
 
@@ -98,13 +110,20 @@ class ExamineSubmissions
             $user_uids[] = $record->uid;
         }
 
-       $pinciples = array();
+        $pinciples = array();
         foreach (user_load_multiple($user_uids) as $u) {
+
+            $this_users_roles = array_filter($u->roles, function ($item) {
+                if (!array_search(trim($item), array('', 'authenticated user', 'anonymous user', 'administrator'))) {
+                    return TRUE;
+                }
+            });
+
             $pinciples[] = array(
                 'name' => $u->realname,
                 'uid' => $u->uid,
                 'mail' => $u->mail,
-                'roles' => implode(', ', array_values($u->roles))
+                'roles' => implode(', ', $this_users_roles)
             );
 
         }
@@ -120,12 +139,6 @@ class ExamineSubmissions
             'Title' => $this->title,
             'Oldest' => $this->oldest_date->human_date,
             'Newest' => $this->newest_date->human_date,
-//            'Contacts' => theme_table(array(
-//                'title'=>t('Contacts'),
-//                'header'=> array_keys($this->principle_contacts),
-//                'rows'=>$this->principle_contacts,
-//                'attributes'=>array()
-//            ))
         );
     }
 
