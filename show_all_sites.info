@@ -3,5 +3,9 @@ description = Produces a block to infer all multisite URLs (if the folder is nam
 core = 7.x
 
 files[]=MultiSites.class.php
+files[]=ExamineSubmissions.class.php
 
 configure = admin/config/show_all_sites
+
+dependencies[]=webform
+dependencies[]=realname

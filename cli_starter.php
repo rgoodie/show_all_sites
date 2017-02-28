@@ -6,7 +6,15 @@
 
 
 
-include_once("Sites.class.php");
+// include_once("MultiSites.class.php");
 
 
-$sites = new Sites();
+// $sites = new MultiSites();
+// print_r($sites);
+
+
+// include_once("ExamineSubmissions.class.php");
+$submissions = new ExamineSubmissions(4);
+print_r($submissions);
+
+
