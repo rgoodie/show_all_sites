@@ -1,150 +1,7 @@
 <?php
 
 
-/**
- * Implements hook_block_info().
- */
-function show_all_sites_block_info()
-{
-    $blocks['sites'] = array(
-        'info' => t('Show Sites'),
-    );
-    $blocks['examine-webform'] = array(
-        'info' => t('Examine the webform. Shows oldest and newest submissions. Show prinple contacts.')
-    );
 
-    return $blocks;
-}
-
-/**
- * Implements hook_block_view().
- */
-function show_all_sites_block_view($delta = '')
-{
-    switch ($delta) {
-        case 'sites':
-            return show_all_sites_sites_block_content();
-            break;
-        case 'examine-webform':
-            return show_all_sites_examine_webform_block_content();
-            break;
-
-    }
-
-}
-
-
-/*
- * Block title and content that lists out sites. Depends on MultiSites.class.php
- * */
-function show_all_sites_sites_block_content()
-{
-
-    // Secondary check
-    if (! _show_all_sites_secondary_permission_check()) {
-        return FALSE;
-    }
-
-    // get url patterns once
-    $url_patterns = variable_get('show_all_sites_URLpattern', '');
-
-    // Check if this has been configured
-    if ($url_patterns == '') {
-        drupal_set_message(t("Please set up <i>URL Patterns</i> in this module's !adminpage.",
-            array(
-                '!adminpage' => l('Admin Page', 'admin/config/show_all_sites')
-            )
-        ), 'error');
-    }
-
-
-    $sites = new MultiSites();
-    $block['subject'] = t('Running Sites');
-    $block['content'][] = array('#markup' => theme_item_list(array(
-        'items' => $sites->getLinks(),
-        'title' => t('Direct URLs'),
-        'type' => 'ul',
-        'attributes' => array()
-    )));
-    $block['content'][] = array('#markup' => theme_item_list(array(
-        'title' => t('All folders'),
-        'items' => $sites->getRaw(),
-        'type' => 'ul',
-        'attributes' => array(),
-    )));
-
-
-    return $block;
-}
-
-
-function show_all_sites_examine_webform_block_content()
-{
-
-    // Secondary check
-    if (! _show_all_sites_secondary_permission_check()) {
-        return FALSE;
-    }
-
-
-    // get list of uids of webforms
-    $webform_uids = array_keys(node_load_multiple(array(), array('type' => 'webform')));
-
-    $submissions = array();
-    foreach ($webform_uids as $webform_uid) {
-        $submissions[] = new ExamineSubmissions($webform_uid);
-    }
-    $reports_table = array();
-    foreach ($submissions as $submission) {
-        $reports_table[] = $submission->toReport();
-    }
-
-    $block['subject'] = t('Examine Webform');
-    $block['content'][] = array('#markup' => theme_table(array(
-        'header' => array_keys($reports_table[0]),
-        'rows' => $reports_table,
-        'attributes' => array('class'=>array(
-            'table',
-            'table-striped'
-        )),
-        'caption' => t('The oldest and newest entries in each webform submission.'),
-        'colgroups' => array(),
-        'sticky' => '',
-        'empty' => ''
-    )));
-
-    $primary_contacts = ExamineSubmissions::getPrinipcleContacts();
-
-    $block['content'][] = array('#markup' => theme_table(array(
-        'header' => array_keys($primary_contacts[0]),
-        'rows' => $primary_contacts,
-        'attributes' => array('class'=>array(
-            'table',
-            'table-striped'
-        )),
-        'caption' => t('Individuals who are in groups other than admin or authenticated who may have ownership of this data.'),
-        'colgroups' => array(),
-        'sticky' => '',
-        'empty' => ''
-    )));
-
-    return $block;
-}
-
-/**
- * Checks permission for the role. Because these are blocks, they could easily be set up wrong. 
- * @return bool
- */
-function _show_all_sites_secondary_permission_check() {
-    if (!user_access('see_show_all_sites')) {
-
-        $msg = t('Your user is not in the proper role to see a block from this MODULE. Although the block was configured for your role. ');
-        drupal_set_message($msg, 'error');
-
-        return FALSE;
-
-    }
-}
 
 
 /**
@@ -158,11 +15,20 @@ function show_all_sites_menu()
         'description' => 'Configure settings for Show All Sites.',
         'page callback' => 'drupal_get_form',
         'page arguments' => array('show_all_sites_settings_form'),
-        'access arguments' => array('administer show_all_sites'),
+        'access arguments' => array('admin_show_all_sites'),
         'file' => 'show_all_sites.admin.inc',
     );
 
+    $items['admin/reports/show_all_sites'] = array(
+        'title'=>'Subsites and Webform Status Report',
+        'description'=>t('Shows all sites in /sites/ folder. Renders URL if configured properly. Also shows summation of all webforms.'),
+        'page callback'=> 'show_all_sites_report_content',
+        'access arguments'=>array('see_show_all_sites'),
+        'file'=>'show_all_sites.report.inc'
+    );
     return $items;
+
+
 }
 
 /**
