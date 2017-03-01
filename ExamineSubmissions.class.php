@@ -57,7 +57,13 @@ class ExamineSubmissions
             ->execute()
             ->fetch();
 
-        $query->human_date = format_date($query->submitted, 'short');
+
+        if (isset($query->submitted)) {
+            $query->human_date = format_date($query->submitted);
+        } else {
+            $query->human_date = 'No Data';
+        }
+
 
         return $query;
     }
@@ -73,7 +79,11 @@ class ExamineSubmissions
             ->execute()
             ->fetch();
 
-        $query->human_date = format_date($query->submitted, 'short');
+        if (isset($query->submitted)) {
+            $query->human_date = format_date($query->submitted);
+        } else {
+            $query->human_date = 'No Data';
+        }
 
         return $query;
 
@@ -155,21 +165,23 @@ class ExamineSubmissions
     public static function getSubmissionsPerUser()
     {
 
-        $query_string = "select u.realname, ws.uid, count(ws.sid) as counted
+        $query_string = "select ws.uid, count(ws.sid) as counted
             FROM {webform_submissions} AS ws
-            INNER JOIN {realname} AS u
-            ON u.uid=ws.uid
             GROUP BY ws.uid
             ORDER BY count(ws.sid) desc;";
-
         $query = db_query($query_string);
 
+
         while ($row = $query->fetchAssoc()) {
+
+            $user = user_load($row['uid']);
+
             $results[] = array(
-                'Name'=>l($row['realname'], 'user/'. $row['uid']) ,
+                'Name'=>l($user->realname, 'user/'. $row['uid']) ,
                 'Count'=>$row['counted']
             );
         }
+
 
         return $results;
 
