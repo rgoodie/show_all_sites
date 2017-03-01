@@ -140,7 +140,7 @@ class ExamineSubmissions
             $pinciples[] = array(
                 'name' => $u->realname,
                 'uid' => $u->uid,
-                'mail' => $u->mail,
+                'mail' => l($u->mail, 'mailto:' . $u->mail),
                 'roles' => implode(', ', $this_users_roles)
             );
 

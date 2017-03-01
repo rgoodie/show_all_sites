@@ -1,21 +1,7 @@
 <?php
 
-function show_all_sites_report_content()
+function show_all_sites_subsites_report_content()
 {
-
-
-
-   /* // get url patterns once
-    $url_patterns = variable_get('show_all_sites_URLpattern', '');
-
-    // Check if this has been configured
-    if ($url_patterns == '') {
-        drupal_set_message(t("Please set up <i>URL Patterns</i> in this module's !adminpage.",
-            array(
-                '!adminpage' => l('Admin Page', '/admin/config/show_all_sites')
-            )
-        ), 'error');
-    }*/
 
     $sites = new MultiSites();
 
@@ -34,6 +20,16 @@ function show_all_sites_report_content()
     ));
 
 
+
+
+
+    return $out;
+}
+
+
+
+
+function show_all_sites_webforms_at_a_glance() {
     // get list of uids of webforms
     $webform_uids = array_keys(node_load_multiple(array(), array('type' => 'webform')));
 
@@ -46,7 +42,7 @@ function show_all_sites_report_content()
         $reports_table[] = $submission->toReport();
     }
 
-    $out .= theme_table(array(
+    $out = theme_table(array(
         'header' => array_keys($reports_table[0]),
         'rows' => $reports_table,
         'attributes' => array('class'=>array(
@@ -74,9 +70,8 @@ function show_all_sites_report_content()
         'empty' => ''
     ));
 
-
-
-
-
     return $out;
+
+
+
 }

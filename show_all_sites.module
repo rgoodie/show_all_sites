@@ -19,13 +19,24 @@ function show_all_sites_menu()
         'file' => 'show_all_sites.admin.inc',
     );
 
-    $items['admin/reports/show_all_sites'] = array(
-        'title'=>'Subsites and Webform Status Report',
+    $items['admin/reports/show/subsites'] = array(
+        'title'=>'Subsites Report',
         'description'=>t('Shows all sites in /sites/ folder. Renders URL if configured properly. Also shows summation of all webforms.'),
-        'page callback'=> 'show_all_sites_report_content',
+        'page callback'=> 'show_all_sites_subsites_report_content',
         'access arguments'=>array('see_show_all_sites'),
-        'file'=>'show_all_sites.report.inc'
+        'file'=>'show_all_sites.report.inc',
     );
+
+
+    $items['admin/reports/show/all/webforms/at/a/glance'] = array(
+        'title'=>t('Webforms at-a-glance Report'),
+        'description'=>t('Also shows summation of all webforms in an at-a-glance styled report.'),
+        'page callback'=> 'show_all_sites_webforms_at_a_glance',
+        'access arguments'=>array('see_show_all_sites'),
+        'file'=>'show_all_sites.report.inc',
+    );
+
+
     return $items;
 
 
