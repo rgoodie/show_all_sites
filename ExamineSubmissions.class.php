@@ -79,22 +79,6 @@ class ExamineSubmissions
 
     }
 
-
-    public function getSubmissionCount() {
-
-        $query = db_select('webform_submissions', 'wfs')
-            ->fields('wfs', array('sid'))
-            ->condition('nid', $this->nid, '=')
-            ->orderBy('submitted', 'desc')
-            ->execute()
-            ->fetchAll()
-            ;
-
-        return count($query);
-
-    }
-
-
     /**
      * Provides all users who belong to other roles outside of the standard three: anonymous, admin, authenticated. Why?
      * Well, these would suggest specialized roles were created to review webform data. Therefore, this allows us to
@@ -151,13 +135,54 @@ class ExamineSubmissions
 
     }
 
+    public function getSubmissionCount()
+    {
+
+        $query = db_select('webform_submissions', 'wfs')
+            ->fields('wfs', array('sid'))
+            ->condition('nid', $this->nid, '=')
+            ->orderBy('submitted', 'desc')
+            ->execute()
+            ->fetchAll();
+
+        return count($query);
+
+    }
+
+    /**
+     * Gathers how many submissions a single user has made.
+     */
+    public static function getSubmissionsPerUser()
+    {
+
+        $query_string = "select u.realname, ws.uid, count(ws.sid) as counted
+            FROM {webform_submissions} AS ws
+            INNER JOIN {realname} AS u
+            ON u.uid=ws.uid
+            GROUP BY ws.uid
+            ORDER BY count(ws.sid) desc;";
+
+        $query = db_query($query_string);
+
+        while ($row = $query->fetchAssoc()) {
+            $results[] = array(
+                'Name'=>l($row['realname'], 'user/'. $row['uid']) ,
+                'Count'=>$row['counted']
+            );
+        }
+
+        return $results;
+
+
+    }
+
     public function toReport()
     {
         return array(
             'Title' => $this->title,
             'Oldest' => $this->oldest_date->human_date,
             'Newest' => $this->newest_date->human_date,
-            'Count'=>$this->record_count,
+            'Count' => $this->record_count,
         );
     }
 

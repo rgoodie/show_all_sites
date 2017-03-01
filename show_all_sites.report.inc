@@ -20,16 +20,12 @@ function show_all_sites_subsites_report_content()
     ));
 
 
-
-
-
     return $out;
 }
 
 
-
-
-function show_all_sites_webforms_at_a_glance() {
+function show_all_sites_webforms_at_a_glance()
+{
     // get list of uids of webforms
     $webform_uids = array_keys(node_load_multiple(array(), array('type' => 'webform')));
 
@@ -45,7 +41,7 @@ function show_all_sites_webforms_at_a_glance() {
     $out = theme_table(array(
         'header' => array_keys($reports_table[0]),
         'rows' => $reports_table,
-        'attributes' => array('class'=>array(
+        'attributes' => array('class' => array(
             'table',
             'table-striped'
         )),
@@ -60,7 +56,7 @@ function show_all_sites_webforms_at_a_glance() {
     $out .= theme_table(array(
         'header' => array_keys($primary_contacts[0]),
         'rows' => $primary_contacts,
-        'attributes' => array('class'=>array(
+        'attributes' => array('class' => array(
             'table',
             'table-striped'
         )),
@@ -70,8 +66,24 @@ function show_all_sites_webforms_at_a_glance() {
         'empty' => ''
     ));
 
-    return $out;
 
+    // number of submissions per user
+    $num_sub_per_user = ExamineSubmissions::getSubmissionsPerUser();
+    $out .= theme_table(array(
+        'header' => array_keys($num_sub_per_user[0]),
+        'rows' => $num_sub_per_user,
+        'attributes' => array('class' =>
+            'table',
+            'table-striped'
+        ),
+        'caption' => t('Number of submissions per individual'),
+        'colgroups' => array(),
+        'empty' => '',
+        'sticky' => ''
+    ));
+
+
+    return $out;
 
 
 }
