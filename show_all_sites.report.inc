@@ -29,6 +29,10 @@ function show_all_sites_webforms_at_a_glance()
     // get list of uids of webforms
     $webform_uids = array_keys(node_load_multiple(array(), array('type' => 'webform')));
 
+    if (count($webform_uids) < 1) {
+        return drupal_set_message(t('No webforms found. Not really much to show here. '));
+    }
+
     $submissions = array();
     foreach ($webform_uids as $webform_uid) {
         $submissions[] = new ExamineSubmissions($webform_uid);
