@@ -4,7 +4,8 @@ Produces a block that shows all sites in a Drupal 7 multisite install. If you've
 # To begin
 - Install the module
 - Configure a list of your domain names (admin/config/show_all_sites)
-- Place and configure the block where you want it
+- Visit your reports page
 
-# Notes
-You may want to limit the block only to administrators or trusted users. 
+# Links 
+- ?q=admin/reports/show/all/webforms/at/a/glance
+- ?q=admin/reports/show/subsites

@@ -20,7 +20,7 @@ function show_all_sites_menu()
     );
 
     $items['admin/reports/show/subsites'] = array(
-        'title'=>'Subsites Report',
+        'title'=>'Subsites At-a-Glance Report',
         'description'=>t('Shows all sites in /sites/ folder. Renders URL if configured properly. Also shows summation of all webforms.'),
         'page callback'=> 'show_all_sites_subsites_report_content',
         'access arguments'=>array('see_show_all_sites'),
